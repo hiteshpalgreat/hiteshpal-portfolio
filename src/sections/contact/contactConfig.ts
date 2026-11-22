@@ -9,4 +9,4 @@
  */
 export const EMAIL = 'hiteshpal980@gmail.com'
 export const WEB3FORMS_KEY = ''
-export const CAL_LINK = ''
+export const CAL_LINK = 'https://cal.com/hiteshpalgreat/project-discovery-call'

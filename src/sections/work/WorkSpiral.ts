@@ -90,23 +90,13 @@ function buildAtlas(cat: WorkCategory, ratios: number[]) {
     g.fillStyle = grad
     g.fill()
     g.clip()
-    // soft light and a few layout blocks so it reads as "a design goes here"
-    const glow = g.createRadialGradient(x + w * 0.2, y + h * 0.15, 0, x + w * 0.2, y + h * 0.15, Math.max(w, h))
-    glow.addColorStop(0, 'rgba(255,255,255,0.35)')
+    // while the real image is on its way: just a soft lit card, no numbers or labels, so it reads as
+    // loading rather than as an empty slot
+    const glow = g.createRadialGradient(x + w * 0.25, y + h * 0.2, 0, x + w * 0.25, y + h * 0.2, Math.max(w, h))
+    glow.addColorStop(0, 'rgba(255,255,255,0.22)')
     glow.addColorStop(1, 'rgba(255,255,255,0)')
     g.fillStyle = glow
     g.fillRect(x, y, w, h)
-    g.fillStyle = 'rgba(255,255,255,0.18)'
-    const m = Math.min(w, h) * 0.09
-    g.fillRect(x + m, y + h - m - h * 0.08, w * 0.55, h * 0.05)
-    g.fillRect(x + m, y + h - m - h * 0.16, w * 0.35, h * 0.035)
-    g.fillStyle = 'rgba(255,255,255,0.92)'
-    g.font = `800 ${Math.round(Math.min(w, h) * 0.3)}px Inter, Arial, sans-serif`
-    g.textBaseline = 'top'
-    g.fillText(String(i + 1).padStart(2, '0'), x + m, y + m * 0.8)
-    g.font = `600 ${Math.max(8, Math.round(Math.min(w, h) * 0.07))}px Inter, Arial, sans-serif`
-    g.fillStyle = 'rgba(255,255,255,0.75)'
-    g.fillText('PLACEHOLDER', x + m, y + m * 0.8 + Math.min(w, h) * 0.33)
     g.restore()
     uv.push({ u: x / canvas.width, v: 1 - (y + h) / canvas.height, w: w / canvas.width, h: h / canvas.height })
   }
@@ -233,10 +223,11 @@ export class WorkSpiral {
           next()
         },
         undefined,
-        () => next(), // a missing file keeps its placeholder
+        () => next(), // a missing file keeps its soft placeholder card
       )
     }
-    for (let k = 0; k < 4; k++) next()
+    // several downloads at once, so the cards fill in quickly on a real connection
+    for (let k = 0; k < 8; k++) next()
   }
 
   /** play a card's clip while it's clearly on screen, pause it otherwise */

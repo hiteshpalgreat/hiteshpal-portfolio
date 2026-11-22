@@ -90,8 +90,9 @@ export function WorkSection() {
 
     // only render while the section is on screen
     const io = new IntersectionObserver(([e]) => fx.setRunning(e.isIntersecting), { rootMargin: '100px' })
-    // start fetching the real images a couple of screens before the spiral is reached
-    const near = new IntersectionObserver(([e]) => e.isIntersecting && (fx.loadImages(), near.disconnect()), { rootMargin: '200% 0px' })
+    // start fetching the real images several screens before the spiral is reached, so they're in by the time
+    // a visitor gets there (on a real connection they take a moment)
+    const near = new IntersectionObserver(([e]) => e.isIntersecting && (fx.loadImages(), near.disconnect()), { rootMargin: '500% 0px' })
     io.observe(section.current!)
     near.observe(section.current!)
 
