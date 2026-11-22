@@ -216,7 +216,9 @@ canvas { display: block; }
   background: linear-gradient(to top, rgba(8, 3, 6, 0.78), rgba(8, 3, 6, 0));
 }
 .reel-ctl.full.show { translate: 0 0; }
-.reel-ctl.full .reel-row { gap: 6px; }
+.reel-ctl.full .reel-row { gap: 6px; justify-content: center; flex-wrap: wrap; }
+/* the buttons sit together in the bottom middle, clear of the music switch in the bottom-left corner */
+.reel-ctl.full .reel-right { margin-left: 14px; }
 .reel-ctl.full .reel-sound { margin-left: 4px; }
 .reel-ctl.full .reel-label { margin-left: 10px; }
 .reel-right { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; }
