@@ -1,0 +1,53 @@
+/* the "send me a message" pop-up */
+.ct-modal {
+  position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 16px;
+  background: rgba(8, 4, 6, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  opacity: 0; visibility: hidden; transition: opacity 400ms ease, visibility 0s linear 400ms;
+}
+.ct-modal.open { opacity: 1; visibility: visible; transition: opacity 400ms ease; }
+.ct-dialog {
+  position: relative; width: min(640px, 100%); max-height: calc(100svh - 32px); overflow: auto;
+  padding: clamp(24px, 4vw, 40px); border-radius: 28px; color: #f6eef1;
+  background: radial-gradient(90% 60% at 100% 0%, rgba(255, 89, 139, 0.16), rgba(255, 89, 139, 0) 60%), #1a1015;
+  box-shadow: inset 0 0 0 1px rgba(255, 160, 190, 0.12), 0 50px 120px -30px rgba(0, 0, 0, 0.8);
+  transform: translateY(26px) scale(0.97); transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ct-modal.open .ct-dialog { transform: none; }
+.ct-close {
+  position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border: 0; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer; color: #f6eef1; background: rgba(255, 255, 255, 0.07); transition: background 300ms ease;
+}
+.ct-close:hover { background: #d63369; }
+.ct-close:focus-visible { outline: 2px solid #ff598b; outline-offset: 2px; }
+.ct-dialog-eyebrow { display: block; font-size: 14px; letter-spacing: 0.04em; color: #ff598b; margin-bottom: 10px; }
+.ct-dialog-title { margin: 0 0 24px; font: 500 clamp(28px, 3.4vw, 40px)/1.02 'Bricolage Grotesque', Inter, sans-serif; letter-spacing: -0.03em; padding-right: 40px; }
+.ct-dialog-title em { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 400; }
+.ct-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ct-field { display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: rgba(246, 238, 241, 0.6); }
+.ct-field i { font-style: normal; opacity: 0.7; }
+.ct-wide { grid-column: 1 / -1; }
+.ct-field input, .ct-field textarea {
+  font: 16px/1.4 Inter, sans-serif; color: #f6eef1; padding: 14px 16px; border-radius: 14px; border: 0;
+  background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); resize: vertical;
+  transition: box-shadow 250ms ease, background 250ms ease;
+}
+.ct-field input::placeholder, .ct-field textarea::placeholder { color: rgba(246, 238, 241, 0.3); }
+.ct-field input:focus, .ct-field textarea:focus { outline: none; background: rgba(255, 255, 255, 0.08); box-shadow: inset 0 0 0 1.5px #ff598b; }
+.ct-submit { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 6px; }
+.ct-send {
+  height: 52px; padding: 0 30px; border: 0; border-radius: 14px; cursor: pointer;
+  background: #ff598b; color: #1a0a10; font: 600 16px/1 Inter, sans-serif; transition: background 300ms ease, transform 300ms ease, box-shadow 300ms ease;
+}
+.ct-send:hover { background: #ff7aa2; transform: translateY(-2px); box-shadow: 0 16px 34px -14px rgba(255, 89, 139, 0.8); }
+.ct-send:disabled { opacity: 0.6; cursor: progress; }
+.ct-send:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.ct-err { font-size: 14px; color: #ff9ab6; }
+.ct-err a { color: inherit; }
+.ct-done { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 0 4px; }
+.ct-done-badge { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: #ff598b; color: #1a0a10; font-size: 24px; margin-bottom: 12px; }
+.ct-done h3 { margin: 0; font: 500 30px/1.1 'Bricolage Grotesque', Inter, sans-serif; letter-spacing: -0.02em; }
+.ct-done p { margin: 0; color: rgba(246, 238, 241, 0.62); }
+.ct-done-actions { display: flex; align-items: center; gap: 18px; margin-top: 22px; }
+.ct-link { padding: 0; border: 0; background: none; color: #ff598b; font: inherit; cursor: pointer; text-decoration: underline; }
+@media (max-width: 560px) { .ct-form { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .ct-modal, .ct-dialog { transition: none; } }

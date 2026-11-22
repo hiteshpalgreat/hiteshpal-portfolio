@@ -1,0 +1,32 @@
+/* The numbers band: same dark wine as Clients above, easing into Selected work below */
+.stats {
+  position: relative; padding: max(96px, 14vh) 7vw max(96px, 13vh);
+  background: linear-gradient(180deg, #1a0a10 0%, #140a0f 100%); color: #f6eef0;
+  font-family: Inter, 'Segoe UI', sans-serif;
+}
+.stats-list {
+  list-style: none; margin: 0 auto; padding: 0; max-width: 1280px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 48px 32px;
+}
+.stat { display: grid; gap: 14px; align-content: start; padding-left: 22px; border-left: 1px solid rgba(246, 238, 240, 0.14);
+  opacity: 0; transform: translateY(24px); transition: opacity 700ms ease, transform 900ms cubic-bezier(.2, .7, .2, 1);
+  transition-delay: calc(var(--i) * 120ms);
+}
+.stats.is-on .stat { opacity: 1; transform: none; }
+.stat-num {
+  font-family: 'Bricolage Grotesque', Inter, sans-serif; font-weight: 700; font-variation-settings: 'opsz' 96;
+  font-size: clamp(64px, 7.6vw, 132px); line-height: 0.9; letter-spacing: -0.04em; font-variant-numeric: tabular-nums;
+}
+.stat-suffix { color: #ff598b; margin-left: 0.02em; }
+.stat-label { font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(246, 238, 240, 0.86); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 900px) {
+  .stats-list { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .stats-list { grid-template-columns: 1fr; gap: 40px; }
+  .stat-num { font-size: 80px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stat { transition: opacity 300ms ease; transform: none; }
+}

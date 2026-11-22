@@ -1,0 +1,130 @@
+{
+  "book_game_changer": {
+    "description": ""
+  },
+  "book_chess_swindler": {
+    "description": ""
+  },
+  "book_death_note": {
+    "description": ""
+  },
+  "book_designing_products": {
+    "description": ""
+  },
+  "book_dont_make_me_think": {
+    "description": ""
+  },
+  "book_one_piece": {
+    "description": ""
+  },
+  "jersey_messi": {
+    "description": ""
+  },
+  "poster_avengers": {
+    "description": ""
+  },
+  "poster_jjk": {
+    "description": ""
+  },
+  "poster_f1": {
+    "description": ""
+  },
+  "game_7_wonders": {
+    "description": ""
+  },
+  "game_splendor": {
+    "description": ""
+  },
+  "game_catan": {
+    "description": ""
+  },
+  "game_scotland_yard": {
+    "description": ""
+  },
+  "mclaren_f1": {
+    "description": ""
+  },
+  "guitar": {
+    "description": ""
+  },
+  "piano": {
+    "description": ""
+  },
+  "cloak_dr_strange": {
+    "description": ""
+  },
+  "arcade": {
+    "description": ""
+  },
+  "deadpool": {
+    "description": ""
+  },
+  "rubiks_cube": {
+    "description": ""
+  },
+  "playing_cards": {
+    "description": ""
+  },
+  "monitor_wide": {
+    "description": ""
+  },
+  "monitor_vertical": {
+    "description": ""
+  },
+  "ipad": {
+    "description": ""
+  },
+  "photo_frame": {
+    "description": "",
+    "photos": [
+      {
+        "src": "/photos/01.webp",
+        "title": "Explorer",
+        "caption": "I'm always planning the next trip, with friends or on my own. New places, new people and new stories keep my head full of ideas."
+      },
+      {
+        "src": "/photos/02.webp",
+        "title": "Graduation",
+        "caption": "I graduated from NIFT in 2024, and those years were the best roller-coaster ride I've ever been on."
+      },
+      {
+        "src": "/photos/03.webp",
+        "title": "Game Night Host",
+        "caption": "I'm a big fan of board and strategy games. At our WeWork co-working space we'd book meeting rooms to teach new games to anyone curious. It grew into a proper board game community with its own tournaments, and the space came to love it."
+      },
+      {
+        "src": "/photos/04.webp",
+        "title": "Building My Ecosystem",
+        "caption": "A year into my job, with freelancing on the side, I bought my iPhone 17 Pro and MacBook M4 Pro with my own money: the kit I use to learn and build interesting things."
+      },
+      {
+        "src": "/photos/05.webp",
+        "title": "Mascots I Visualised",
+        "caption": "A gamified me in the middle, surrounded by the mascots I designed and visualised while working with consumer gaming and iGaming platforms."
+      },
+      {
+        "src": "/photos/06.webp",
+        "title": "First On-site Job",
+        "caption": "In September 2024 I joined Metafusion, my very first on-site corporate job after graduating."
+      }
+    ],
+    "photos_note": "Each photo: src (a path under public/photos), title (written on the print) and caption (shown under the stack while that photo is on top). frame_photo: which photo (1 = first) shows in the frame on the desk.",
+    "frame_photo": 5
+  },
+  "boarding_passes": {
+    "description": ""
+  },
+  "screens": {
+    "monitor_wide": {
+      "video": "",
+      "image": "/screens/framer-home.webp",
+      "link": "https://hiteshpalgreat.framer.website/"
+    },
+    "monitor_vertical": {
+      "video": ""
+    },
+    "ipad": {
+      "video": ""
+    }
+  }
+}

@@ -1,0 +1,133 @@
+/* About section: Noomo-style pale stage, blush white with a wine undertone, a fine dot grid, black type. */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('/fonts/bricolage-grotesque.woff2') format('woff2');
+  font-weight: 200 800; font-stretch: 75% 100%; font-display: swap;
+}
+@font-face {
+  font-family: 'Aston Script Pro';
+  src: url('/fonts/aston-script-pro-bold.woff2') format('woff2');
+  font-weight: 700; font-display: swap;
+}
+.about { position: relative; background: #f0dfe3; font-family: Inter, 'Segoe UI', sans-serif; }
+.ab-stage {
+  position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden;
+  /* centred, so its top edge matches the bottom edge of My Approach above: no seam between them */
+  background: radial-gradient(70% 80% at 50% 50%, #fbf2f4 0%, #f3e3e7 55%, #e9d0d7 100%);
+}
+.ab-dots {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(92, 18, 42, 0.21) 1.5px, transparent 2px);
+  background-size: 24px 24px; background-position: 50% 0;
+  /* the dots fade out toward the middle, like Noomo's grid */
+  -webkit-mask-image: radial-gradient(75% 85% at 50% 50%, rgba(0, 0, 0, 0.35) 0%, #000 100%);
+  mask-image: radial-gradient(75% 85% at 50% 50%, rgba(0, 0, 0, 0.35) 0%, #000 100%);
+}
+/* soft pinkish red light behind the photo */
+.ab-glow {
+  position: absolute; left: 50%; top: 56%; width: min(70vh, 80vw); height: min(70vh, 80vw);
+  transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 74, 112, 0.5) 0%, rgba(214, 48, 92, 0.24) 38%, rgba(150, 20, 60, 0) 70%);
+  filter: blur(18px);
+}
+.ab-gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* the line about him, on a frosted glass card that tips toward the pointer */
+.ab-line {
+  position: absolute; left: 50%; bottom: 5vh; z-index: 3; width: max-content; max-width: 92vw;
+  transform: translate(-50%, 14px); opacity: 0;
+}
+.ab-card {
+  position: relative; padding: 16px 24px; border-radius: 18px; overflow: hidden;
+  background: rgba(252, 244, 246, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 12px 40px rgba(70, 10, 30, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%);
+  transform-style: preserve-3d; will-change: transform;
+  transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* a soft highlight that follows the pointer */
+.ab-card::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 300ms ease;
+  background: radial-gradient(220px circle at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 70%);
+}
+.ab-card:hover { transition-duration: 120ms; }
+.ab-card:hover::before { opacity: 1; }
+.ab-card p {
+  position: relative; margin: 0; text-align: center;
+  font-family: Inter, 'Segoe UI', sans-serif; font-weight: 500;
+  font-size: calc(14px + 1pt); line-height: 1.5; letter-spacing: 0.06em; text-transform: uppercase;
+  color: #1c0910;
+}
+.ab-note {
+  position: absolute; left: 7vw; bottom: 40px; margin: 0; z-index: 2;
+  font-size: 13px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(60, 14, 28, 0.55);
+}
+.ab-note span { color: #1c0910; }
+/* the pale veil that clears the stage before the Ottrly mark draws */
+.ab-veil {
+  position: absolute; inset: 0; z-index: 5; opacity: 0; pointer-events: none;
+  background: radial-gradient(70% 80% at 50% 45%, #fbf3f5 0%, #f5e8eb 60%, #eedde2 100%);
+}
+.ab-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 720px) {
+  .ab-note { left: 20px; bottom: 24px; }
+  .ab-line { bottom: 9vh; }
+  .ab-card { padding: 12px 16px; }
+  .ab-card p { font-size: calc(12px + 1pt); }
+  .ab-l-0 { white-space: normal; }
+}
+/* the Ottrly mark (drawn by the Clients section): inverts over whatever is under it */
+.ab-mark { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 6; pointer-events: none; mix-blend-mode: difference; }
+
+/* pointer parallax (--px / --py run -1..1, set from the cursor); each layer moves a different amount */
+.ab-dots, .ab-glow, .ab-note, .ab-hello, .ab-title { transition: translate 900ms cubic-bezier(0.22, 1, 0.36, 1); }
+.ab-card { transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1), translate 900ms cubic-bezier(0.22, 1, 0.36, 1); }
+.ab-dots { inset: -24px; translate: calc(var(--px, 0) * 14px) calc(var(--py, 0) * 10px); }
+.ab-glow { translate: calc(var(--px, 0) * 28px) calc(var(--py, 0) * 18px); }
+.ab-card { translate: calc(var(--px, 0) * -10px) calc(var(--py, 0) * -6px); }
+.ab-note { translate: calc(var(--px, 0) * 8px) calc(var(--py, 0) * 5px); }
+.ab-hello { translate: calc(var(--px, 0) * 18px) calc(var(--py, 0) * 12px); }
+.ab-title { translate: calc(var(--px, 0) * -16px) calc(var(--py, 0) * -10px); }
+@media (prefers-reduced-motion: reduce) { .ab-dots, .ab-glow, .ab-card, .ab-note, .ab-hello, .ab-title { translate: none; } }
+
+/* the card: two lines, the first kept on one line on wide screens */
+.ab-l { display: block; }
+.ab-l-0 { white-space: nowrap; }
+.ab-l-1 { color: #8e1538; }
+
+/* "I'm Hitesh Pal" above the photo: a slow wave runs through the letters, lifting and warming each one */
+.ab-hello {
+  position: absolute; right: 63.5vw; top: 20vh; z-index: 3; margin: 0; opacity: 0; pointer-events: none;
+  font-family: 'Bricolage Grotesque', Inter, sans-serif; font-weight: 500; font-variation-settings: 'opsz' 48;
+  font-size: clamp(22px, 2.55vw, 46px); letter-spacing: -0.01em; line-height: 1; white-space: nowrap; color: #a3123a;
+}
+.ab-hello span { display: inline-block; animation: ab-wave 3.6s ease-in-out infinite; }
+@keyframes ab-wave {
+  0%, 60%, 100% { transform: translateY(0); color: #a3123a; }
+  22% { transform: translateY(-0.12em); color: #ff598b; }
+}
+
+/* "Visual Communication Designer" over the photo; letters warm to pink near the pointer (set from JS) */
+.ab-title {
+  position: absolute; left: 36vw; top: 59vh; z-index: 3; margin: 0; opacity: 0; pointer-events: none;
+  font-family: 'Bricolage Grotesque', Inter, sans-serif; font-weight: 700; font-variation-settings: 'opsz' 96;
+  font-size: clamp(26px, 3.25vw, 62px); line-height: 0.98; letter-spacing: -0.015em; color: #fff;
+  text-shadow: 0 2px 24px rgba(30, 4, 12, 0.35);
+}
+.ab-row { display: block; white-space: nowrap; }
+.ab-title .ch { display: inline-block; transition: color 260ms ease; }
+.ab-row-2 {
+  text-align: right; margin-right: -2.6vw; margin-top: 0.42em;
+  font-weight: 400; font-size: 0.9em; letter-spacing: 0;
+}
+.ab-title .ab-script {
+  font-family: 'Aston Script Pro', 'Snell Roundhand', cursive; font-weight: 700;
+  font-size: 1.55em; line-height: 0; vertical-align: -0.02em; margin-right: -0.1em;
+}
+@media (max-width: 720px), (max-aspect-ratio: 1/1) {
+  .ab-hello { right: auto; left: 8vw; top: 16vh; font-size: 7vw; }
+  .ab-title { left: 8vw; top: 52vh; font-size: 9vw; }
+  .ab-row-2 { margin-right: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .ab-hello span { animation: none; } }

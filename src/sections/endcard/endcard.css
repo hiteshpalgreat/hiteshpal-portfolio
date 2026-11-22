@@ -1,0 +1,120 @@
+/* The sign-off. The contact screen and this card share one sticky stage (.finale): once the contact
+   screen is in place, the scroll room under it brings the stamp up from below, tilted, straightening as
+   it rises and settling near the bottom of the screen, while the contact screen behind blurs and dims. */
+.finale {
+  /* --hold: how long the contact screen rests on its own before the card starts to rise */
+  --hold: 70vh;
+  position: relative; height: calc(100vh + var(--hold) + 150vh); height: calc(100svh + var(--hold) + 150svh);
+}
+.finale-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+.endcard { position: absolute; inset: 0; z-index: 5; pointer-events: none; display: flex; align-items: center; justify-content: center; padding: clamp(14px, 3.5vh, 40px) clamp(12px, 3vw, 48px); }
+.ec-veil {
+  position: absolute; inset: 0; opacity: 0; pointer-events: none;
+  background: rgba(10, 5, 8, 0.42);
+  -webkit-backdrop-filter: blur(12px) saturate(0.9); backdrop-filter: blur(12px) saturate(0.9);
+}
+
+/* the stamp: a shadow wrapper (a mask would clip the shadow), the perforated card inside */
+.ec-wrap {
+  position: relative; z-index: 1; pointer-events: auto; visibility: hidden;
+  /* as big as the screen allows, keeping the stamp's proportions */
+  width: min(1040px, 100%, calc((100svh - 150px) * 1.72));
+  transform-origin: 50% 50%; will-change: transform;
+  filter: drop-shadow(0 40px 60px rgba(0, 0, 0, 0.45)) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
+}
+.ec-stamp {
+  --r: clamp(7px, 0.85vw, 12px);
+  position: relative; aspect-ratio: 1.72; padding: calc(2.2 * var(--r));
+  background: #f9f4ea;
+  /* the perforations: a row of half-circle bites all round the edge */
+  -webkit-mask:
+    radial-gradient(var(--r), #0000 97%, #000) round calc(-1.5 * var(--r)) calc(-1.5 * var(--r)) / calc(3 * var(--r)) calc(3 * var(--r)),
+    linear-gradient(#000 0 0) no-repeat 50% / calc(100% - 3 * var(--r)) calc(100% - 3 * var(--r));
+  mask:
+    radial-gradient(var(--r), #0000 97%, #000) round calc(-1.5 * var(--r)) calc(-1.5 * var(--r)) / calc(3 * var(--r)) calc(3 * var(--r)),
+    linear-gradient(#000 0 0) no-repeat 50% / calc(100% - 3 * var(--r)) calc(100% - 3 * var(--r));
+}
+/* the printed face inside the white stamp margin */
+.ec-face {
+  position: relative; height: 100%; overflow: hidden;
+  display: grid; grid-template-columns: 1fr 1.05fr; grid-template-rows: auto 1fr auto; gap: 0 clamp(20px, 3vw, 48px);
+  padding: clamp(20px, 3.2vw, 48px);
+  color: #fff6ee;
+  background:
+    radial-gradient(90% 120% at 100% 0%, rgba(255, 140, 175, 0.45), rgba(255, 140, 175, 0) 55%),
+    radial-gradient(80% 100% at 0% 100%, rgba(90, 8, 34, 0.55), rgba(90, 8, 34, 0) 60%),
+    #d8325f;
+}
+/* paper grain over the print */
+.ec-face::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.22; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .2 0 0 0 0 .25 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.ec-dots { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.ec-top { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; position: relative; z-index: 1; }
+.ec-kicker { font: 500 clamp(11px, 1vw, 13px)/1.3 Inter, sans-serif; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.85; }
+.ec-value { text-align: right; font: 600 clamp(13px, 1.2vw, 16px)/1.1 'Bricolage Grotesque', Inter, sans-serif; letter-spacing: 0.04em; }
+.ec-value b { display: block; font-size: clamp(30px, 3.6vw, 54px); font-weight: 700; letter-spacing: -0.03em; line-height: 0.9; }
+
+/* the postmark: a ring of words and a few wavy cancellation lines, slowly turning */
+.ec-postmark {
+  position: absolute; z-index: 2; right: 30%; top: -2%; width: clamp(110px, 13vw, 180px); aspect-ratio: 1;
+  color: rgba(40, 6, 18, 0.55); pointer-events: none; mix-blend-mode: multiply;
+}
+.ec-postmark svg { width: 100%; height: 100%; overflow: visible; }
+.ec-postmark .ring { animation: ec-turn 40s linear infinite; transform-origin: 100px 100px; }
+.ec-postmark text { font: 700 15px 'Bricolage Grotesque', Inter, sans-serif; letter-spacing: 0.12em; fill: currentColor; }
+@keyframes ec-turn { to { transform: rotate(360deg); } }
+
+.ec-name {
+  grid-column: 1; grid-row: 3; align-self: end; position: relative; z-index: 1; margin: 0; cursor: default;
+  font: 800 clamp(44px, 7vw, 116px)/1.04 'Bricolage Grotesque', Inter, sans-serif; letter-spacing: 0.01em; color: #fff6ee;
+  width: fit-content;
+}
+.ec-line { display: grid; white-space: nowrap; overflow: hidden; }
+/* each line is its own window and the windows never overlap, so a letter leaving one line can't show
+   over the other */
+.ec-word { grid-area: 1 / 1; display: block; }
+/* the letters of the name on show glide up out of their line (clipped by its edge, no fading); a moment
+   after each one starts to leave, the matching letter of the other name follows it up from below, so the
+   new letter is already peeking in as the old one slips out. Moving away plays it back the same way. */
+.ec-ch { display: inline-block; transition: transform 520ms cubic-bezier(0.65, 0, 0.35, 1); }
+.ec-word.b { color: #ffe8b8; }
+.ec-word.a .ec-ch { transition-delay: calc(var(--d) + 40ms); }
+.ec-word.b .ec-ch { transform: translateY(105%); transition-delay: var(--d); }
+.ec-name.alt .ec-word.a .ec-ch { transform: translateY(-105%); transition-delay: var(--d); }
+.ec-name.alt .ec-word.b .ec-ch { transform: none; transition-delay: calc(var(--d) + 40ms); }
+.ec-side { grid-column: 2; grid-row: 2 / 4; align-self: end; position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(16px, 2.6vh, 28px); }
+.ec-tag { margin: 0; font: 500 clamp(15px, 1.35vw, 19px)/1.45 Inter, sans-serif; color: rgba(255, 246, 238, 0.92); max-width: 34ch; }
+.ec-cta {
+  all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 14px; width: fit-content;
+  font: 600 clamp(22px, 2.3vw, 34px)/1 'Bricolage Grotesque', Inter, sans-serif; letter-spacing: -0.03em; color: #ffe8b8;
+  transition: gap 400ms cubic-bezier(0.22, 1, 0.36, 1), color 300ms ease;
+}
+.ec-cta svg { width: 0.9em; height: 0.9em; }
+.ec-cta:hover { gap: 22px; color: #fff; }
+.ec-cta:focus-visible { outline: 2px solid #ffe8b8; outline-offset: 6px; border-radius: 6px; }
+.ec-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+@media (min-width: 861px) { .ec-links { flex-wrap: nowrap; } }
+.ec-links span { font: 700 clamp(14px, 1.2vw, 16px)/1 Inter, sans-serif; letter-spacing: 0.14em; text-transform: uppercase; margin-right: 6px; }
+.ec-links a {
+  display: grid; place-items: center; width: clamp(38px, 3.1vw, 46px); aspect-ratio: 1; border-radius: 12px;
+  background: #fff6ee; color: #2a0b16; text-decoration: none; cursor: pointer;
+  transition: background 250ms ease, color 250ms ease, transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ec-links a svg { width: 52%; height: 52%; }
+.ec-links a:hover { background: #2a0b16; color: #fff6ee; transform: translateY(-3px) rotate(-4deg); }
+.ec-links a:focus-visible { outline: 2px solid #fff6ee; outline-offset: 2px; }
+.ec-links a.soon { opacity: 0.55; cursor: default; }
+.ec-links a.soon:hover { background: #fff6ee; color: #2a0b16; transform: none; }
+.ec-copy { font: 500 13px/1.3 Inter, sans-serif; opacity: 0.85; }
+
+@media (max-width: 860px) {
+  .ec-wrap { width: min(100%, calc((100svh - 40px) * 0.62)); }
+  .ec-stamp { aspect-ratio: auto; }
+  .ec-face { grid-template-columns: 1fr; grid-template-rows: auto auto auto; gap: 22px; }
+  .ec-name { grid-row: 2; align-self: start; margin-top: 5vh; }
+  .ec-side { grid-column: 1; grid-row: 3; }
+  .ec-postmark { right: 6%; top: 18%; }
+}
+@media (prefers-reduced-motion: reduce) { .ec-postmark .ring { animation: none; } }
