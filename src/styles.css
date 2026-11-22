@@ -374,6 +374,10 @@ html.reel-idle .reel-edge { opacity: 0 !important; }
 
 /* the chip says where a glowing screen leads */
 .chip.lead { border-color: rgba(255, 89, 139, 0.55); }
+.chip-sub {
+  margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--panel-line);
+  color: var(--accent); font-weight: 600;
+}
 
 /* ------------------------------------------------------------------ */
 /* the photo frame's photos, as a stack of prints                      */

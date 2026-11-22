@@ -59,9 +59,13 @@ export function LabelChip() {
   const viewHover = useStore((s) => s.viewHover)
   const lead = viewHover ? LEADS[viewHover.userData.item_id as string] : undefined
   const label = lead ?? (hovered?.userData.label as string | undefined)
+  const view = useStore((s) => s.view)
+  // the arcade is playable: say so while it's hovered from the room (not once you're already at it)
+  const playHint = !lead && !view && hovered?.userData.item_id === 'arcade'
   return (
     <div ref={ref} className={`chip ${(hovered && dwell) || lead ? 'show' : ''} ${lead ? 'lead' : ''}`} aria-hidden>
       {label}
+      {playHint && <span className="chip-sub">Click to start playing</span>}
     </div>
   )
 }
