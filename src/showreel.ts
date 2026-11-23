@@ -21,6 +21,7 @@ class Showreel {
   private index = 0
   private wantSound = false // what the viewer chose
   private wantPaused = false
+  private away = false // the room is fully covered by the sections below
   private hidden = false // the room is off screen: stay silent whatever the choice
   private listeners = new Set<Listener>()
 
@@ -37,7 +38,7 @@ class Showreel {
 
   /** keep playing unless the viewer paused it */
   resume() {
-    if (!this.wantPaused) this.video.play().catch(() => {})
+    if (!this.wantPaused && !this.away) this.video.play().catch(() => {})
   }
 
   togglePlay() {
@@ -97,6 +98,17 @@ class Showreel {
   }
 
   /** silence the reel while the room is scrolled away, without forgetting the viewer's choice */
+  /**
+   * The next section fully covers the room: pause, since nobody can see the reel and decoding it in
+   * the background costs phones memory and battery. Picks up again on the way back.
+   */
+  setAway(away: boolean) {
+    if (away === this.away) return
+    this.away = away
+    if (away) this.video.pause()
+    else this.resume()
+  }
+
   setHidden(hidden: boolean) {
     if (hidden === this.hidden) return
     this.hidden = hidden

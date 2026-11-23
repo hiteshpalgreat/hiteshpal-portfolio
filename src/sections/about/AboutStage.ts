@@ -242,7 +242,10 @@ export class AboutStage {
       }
     })
     // parallax: the words and the photo drift against each other with the cursor, so they read as layers
-    this.block.position.set(-this.look.x * W * 0.012 * m, this.look.y * H * 0.012 * m, 0)
+    // on portrait screens the photo is smaller and the head sits higher: lift the words up behind it,
+    // so their tops still show above his head
+    const lift = this.camera.aspect < 1 ? H * 0.14 : 0
+    this.block.position.set(-this.look.x * W * 0.012 * m, lift + this.look.y * H * 0.012 * m, 0)
     this.person.position.x = this.look.x * W * 0.008 * m
     // the photo turns a touch toward the cursor and breathes
     this.person.rotation.y = this.look.x * 0.07 * m

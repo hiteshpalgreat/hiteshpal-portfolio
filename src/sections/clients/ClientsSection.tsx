@@ -199,17 +199,22 @@ export function ClientsSection() {
       band.current!.style.opacity = entering ? '1' : '0'
 
       if (!entering) return
-      const R = vw * 0.56 // cylinder radius: small enough that the rows visibly wrap around
-      const bend = vh * 0.12 // how much the rows lift toward the sides
-      const lh = Math.min(38, Math.max(24, vh * 0.034)) // logo height at the front
+      const narrow = vw < 720
+      const bend = vh * (narrow ? 0.07 : 0.12) // how much the rows lift toward the sides
+      // logo height at the front; phones get a bit more so the marks stay readable
+      const lh = narrow ? Math.min(40, Math.max(32, vw * 0.09)) : Math.min(38, Math.max(24, vh * 0.034))
       const maxW = lh * 2.8 // very wide wordmarks are shown a little smaller
       let idx = 0
       rows.forEach((list, r) => {
         const row = ROWS[r]
-        const circ = Math.PI * 2 * R
         const minGap = lh * 1.4
         let ws = list.map((l: ClientLogo) => Math.min(lh * l.ratio, maxW))
         let total = ws.reduce((a, w) => a + w, 0)
+        // cylinder radius: small enough that the rows visibly wrap around. On a phone the screen is
+        // too narrow to fit a whole row around it, so the cylinder grows (and reaches past the edges)
+        // instead of the logos shrinking to specks
+        const R = Math.max(vw * 0.56, narrow ? (total + minGap * list.length) / (Math.PI * 2) : 0)
+        const circ = Math.PI * 2 * R
         const fitK = (circ - minGap * list.length) / total
         if (fitK < 1) {
           ws = ws.map((w) => w * fitK)

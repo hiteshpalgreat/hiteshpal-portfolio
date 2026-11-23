@@ -1,4 +1,5 @@
 import { MusicToggle } from './ui/MusicToggle'
+import { RoomPan } from './ui/RoomPan'
 import { Suspense, useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
@@ -27,6 +28,10 @@ if (typeof location !== 'undefined' && location.search.includes('test')) gsap.ti
  * until its screen (playing the showreels) fills the view. Then the next section scrolls up over it.
  * Everything is driven by the scroll position, so it holds still when you stop.
  */
+// phones have far less memory for a page: render the room a touch below full retina sharpness there
+const LOW_MEM =
+  typeof window !== 'undefined' &&
+  (window.matchMedia('(pointer: coarse)').matches || Math.min(window.innerWidth, window.innerHeight) < 600)
 const NIGHT = new THREE.Color('#120b16')
 const PALE = new THREE.Color('#f3e3e7')
 const BACK = new THREE.Color()
@@ -49,6 +54,7 @@ function useRoomScroll(track: React.RefObject<HTMLDivElement>) {
       // once the next section covers the room, stop drawing it and keep the reel silent
       const covered = y >= end - 2
       if (covered !== st.dispersing) st.set({ dispersing: covered })
+      reel.setAway(covered)
       reel.setHidden(y > (FLY + HOLD + 0.5) * vh)
       // behind everything: the night of the room turns into the pale blush of the sections below
       const t = THREE.MathUtils.smoothstep(y / vh, FLY + HOLD, FLY + HOLD + 1)
@@ -134,7 +140,7 @@ export default function App() {
       <div className={`hero ${dispersing ? 'gone' : ''}`}>
       <Canvas
         frameloop={dispersing ? 'never' : 'always'}
-        dpr={[1, 2]}
+        dpr={[1, LOW_MEM ? 1.5 : 2]}
         gl={{ antialias: false, toneMapping: THREE.NoToneMapping, outputColorSpace: THREE.SRGBColorSpace, powerPreference: 'high-performance' }}
         flat
         onPointerMissed={() => {
@@ -164,6 +170,7 @@ export default function App() {
       <SectionNav />
       <PhotoStack />
       <MusicToggle />
+      <RoomPan />
       <Loader />
     </>
   )

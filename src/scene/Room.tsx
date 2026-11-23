@@ -328,10 +328,18 @@ function useScreenVideos(scene: THREE.Object3D) {
         cleanups.push(() => tex.dispose())
         return
       }
-      const onVis = () => (document.hidden ? video.pause() : video.play().catch(() => {}))
-      document.addEventListener('visibilitychange', onVis)
+      // only play while the room can be seen: not in a background tab, nor once the sections cover it
+      const sync = () => {
+        if (document.hidden || useStore.getState().dispersing) video.pause()
+        else video.play().catch(() => {})
+      }
+      document.addEventListener('visibilitychange', sync)
+      const unsub = useStore.subscribe((s, prev) => {
+        if (s.dispersing !== prev.dispersing) sync()
+      })
       cleanups.push(() => {
-        document.removeEventListener('visibilitychange', onVis)
+        unsub()
+        document.removeEventListener('visibilitychange', sync)
         video.pause()
         tex.dispose()
       })

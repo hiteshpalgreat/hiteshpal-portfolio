@@ -508,3 +508,23 @@ html.reel-idle .reel-edge { opacity: 0 !important; }
 @keyframes mt-bar { 0%, 100% { transform: scaleY(0.25); } 50% { transform: scaleY(1); } }
 .mt-label { min-width: 66px; }
 @media (prefers-reduced-motion: reduce) { .music-toggle.on .mt-wave i { animation: none; transform: scaleY(0.6); } }
+
+/* ------------------------------------------------------------------ */
+/* portrait screens: look left and right in the room                   */
+/* ------------------------------------------------------------------ */
+.hero canvas { touch-action: pan-y; }
+.room-pan { position: fixed; inset: 0; z-index: 12; pointer-events: none; opacity: 0; transition: opacity 300ms ease; }
+.room-pan.show { opacity: 1; }
+.room-pan.show .rp-btn { pointer-events: auto; }
+.rp-btn {
+  position: absolute; top: 50%; width: 44px; height: 44px; margin-top: -22px; padding: 0;
+  display: grid; place-items: center; border-radius: 50%; cursor: pointer;
+  background: var(--panel); border: 1px solid var(--panel-line); color: #fff;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  transition: opacity 250ms ease, transform 200ms ease;
+}
+.rp-btn.left { left: 12px; }
+.rp-btn.right { right: 12px; }
+.rp-btn:active { transform: scale(0.92); }
+.rp-btn:disabled { opacity: 0.25; cursor: default; }
+.rp-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }

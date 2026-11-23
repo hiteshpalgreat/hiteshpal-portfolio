@@ -12,6 +12,14 @@ const DOOR_PITCH = THREE.MathUtils.degToRad(4)
 const UP = new THREE.Vector3(0, 1, 0)
 const RIGHT = new THREE.Vector3(1, 0, 0)
 
+/**
+ * Look left and right on narrow (portrait) screens, where only a slice of the room fits.
+ * v runs -1 (far left) to 1 (far right); limit is how far that turns the view, in radians,
+ * so the full width of the desktop framing can be reached. Zero on wide screens.
+ */
+export const roomPan = { v: 0, limit: 0 }
+const HERO_ASPECT = 16 / 9
+
 const smooth = (e0: number, e1: number, x: number) => {
   const t = THREE.MathUtils.clamp((x - e0) / (e1 - e0), 0, 1)
   return t * t * (3 - 2 * t)
@@ -54,9 +62,15 @@ export function CameraRig() {
       camera.userData.yaw = 0
       return
     }
-    let yawT = 0
+    // portrait screens: how far the view may turn so the whole desktop framing can be looked at
+    const half = THREE.MathUtils.degToRad(camera.fov) / 2
+    roomPan.limit =
+      camera.aspect < 1.2
+        ? Math.max(0, Math.atan(Math.tan(half) * HERO_ASPECT) - Math.atan(Math.tan(half) * camera.aspect))
+        : 0
+    let yawT = -roomPan.v * roomPan.limit
     let pitchT = 0
-    if (pointer.inside && !focus && !reducedMotion) {
+    if (pointer.inside && !focus && !reducedMotion && roomPan.limit === 0) {
       const x = pointer.x
       if (x < 0.2) yawT = MAX_YAW * smooth(0.2, 0, x)
       else if (x > 0.8) yawT = -MAX_YAW * smooth(0.8, 1, x)

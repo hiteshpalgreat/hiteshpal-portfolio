@@ -127,7 +127,8 @@
 }
 @media (max-width: 720px), (max-aspect-ratio: 1/1) {
   .ab-hello { right: auto; left: 8vw; top: 16vh; font-size: 7vw; }
-  .ab-title { left: 8vw; top: 52vh; font-size: 9vw; }
-  .ab-row-2 { margin-right: 0; }
+  /* centred on his chest, just below the neck */
+  .ab-title { left: 0; right: 0; top: auto; bottom: calc(9vh + 104px); font-size: 9vw; text-align: center; }
+  .ab-row-2 { margin-right: 0; text-align: center; }
 }
 @media (prefers-reduced-motion: reduce) { .ab-hello span { animation: none; } }

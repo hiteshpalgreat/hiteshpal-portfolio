@@ -45,3 +45,9 @@ export function scrollToY(top: number, reducedMotion: boolean, duration = 1.8) {
   if (lenis && !reducedMotion) lenis.scrollTo(top, { duration, easing, force: true })
   else window.scrollTo({ top, behavior: reducedMotion ? 'auto' : 'smooth' })
 }
+
+/** Jump to a page position at once (resuming after a reload). */
+export function jumpToY(top: number) {
+  if (lenis) lenis.scrollTo(top, { immediate: true, force: true })
+  else window.scrollTo(0, top)
+}

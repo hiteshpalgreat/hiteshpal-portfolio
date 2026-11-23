@@ -19,10 +19,44 @@ const APPROACH = 3.2 // the spiral starts filling in this far before its title i
 const RADIUS = 0.82 // circular spiral radius
 
 /** a card that plays a muted, looping clip while it's on screen (poster image until then) */
-type VideoSlot = { url: string; mat: THREE.MeshBasicMaterial; el: HTMLVideoElement | null; tex: THREE.VideoTexture | null; playing: boolean }
+type VideoSlot = {
+  url: string
+  mat: THREE.MeshBasicMaterial
+  el: HTMLVideoElement | null
+  tex: THREE.VideoTexture | null
+  playing: boolean
+  /** the still shown before (and, on phones, again after) the clip plays */
+  poster: THREE.Texture | null
+}
+
+/**
+ * Phones (iPhones above all) have far less memory for a web page: there the spiral keeps every image
+ * small, plays only a few clips at once and lets go of each clip as soon as it leaves the screen.
+ * Without this the 130-odd full-size images alone come to several hundred MB and iOS closes the page.
+ */
+const LOW_MEM =
+  typeof window !== 'undefined' &&
+  (window.matchMedia('(pointer: coarse)').matches || Math.min(window.innerWidth, window.innerHeight) < 600)
 
 /** at most this many clips play at once; the rest wait on their poster */
-const MAX_PLAYING = 10
+const MAX_PLAYING = LOW_MEM ? 3 : 10
+/** longest side of a card image on the GPU: about what a card ever covers on screen */
+const MAX_IMAGE = LOW_MEM ? 420 : 960
+
+/** Scale an image down to at most `max` px on its longest side (images already small enough pass through). */
+function shrink(img: HTMLImageElement, max: number): HTMLImageElement | HTMLCanvasElement {
+  const w = img.naturalWidth || img.width
+  const h = img.naturalHeight || img.height
+  const k = max / Math.max(w, h)
+  if (k >= 1) return img
+  const c = document.createElement('canvas')
+  c.width = Math.max(1, Math.round(w * k))
+  c.height = Math.max(1, Math.round(h * k))
+  const g = c.getContext('2d')!
+  g.imageSmoothingQuality = 'high'
+  g.drawImage(img, 0, 0, c.width, c.height)
+  return c
+}
 
 type Card = {
   video?: VideoSlot
@@ -134,7 +168,7 @@ export class WorkSpiral {
 
   constructor(private canvas: HTMLCanvasElement, categories: WorkCategory[], private reduced: boolean) {
     this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' })
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75))
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_MEM ? 1.5 : 1.75))
     this.renderer.setClearColor(0x000000, 0)
     this.scene.add(this.world)
 
@@ -159,7 +193,9 @@ export class WorkSpiral {
         const mat = new THREE.MeshBasicMaterial({ map, transparent: true, depthWrite: false, side: THREE.DoubleSide })
         this.disposables.push(mat, map)
         if (item?.src) this.pending.push({ src: item.src, mat })
-        const video: VideoSlot | undefined = item?.video ? { url: item.video, mat, el: null, tex: null, playing: false } : undefined
+        const video: VideoSlot | undefined = item?.video
+          ? { url: item.video, mat, el: null, tex: null, playing: false, poster: null }
+          : undefined
         if (video) this.videos.push(video)
         const mesh = new THREE.Mesh(geo, mat)
         // card size: longest side = size
@@ -207,18 +243,32 @@ export class WorkSpiral {
   loadImages() {
     if (this.loading) return
     this.loading = true
-    const loader = new THREE.TextureLoader()
+    const loader = new THREE.ImageLoader()
+    loader.setCrossOrigin('anonymous')
     const queue = this.pending.slice()
     const next = () => {
       const job = queue.shift()
       if (!job) return
       loader.load(
         job.src,
-        (t) => {
+        (img) => {
+          // stored at card size, without mipmaps: a fraction of the memory of the full image
+          const t = new THREE.Texture(shrink(img, MAX_IMAGE))
           t.colorSpace = THREE.SRGBColorSpace
-          t.anisotropy = 4
-          job.mat.map = t
-          job.mat.needsUpdate = true
+          t.generateMipmaps = false
+          t.minFilter = THREE.LinearFilter
+          t.needsUpdate = true
+          const old = job.mat.map
+          const slot = this.videos.find((x) => x.mat === job.mat)
+          if (slot && old instanceof THREE.VideoTexture) {
+            // its clip is already playing: this image becomes the still it returns to
+            slot.poster = t
+          } else {
+            job.mat.map = t
+            job.mat.needsUpdate = true
+            // the placeholder clone isn't needed any more
+            if (old && old !== t) old.dispose()
+          }
           this.disposables.push(t)
           next()
         },
@@ -227,7 +277,7 @@ export class WorkSpiral {
       )
     }
     // several downloads at once, so the cards fill in quickly on a real connection
-    for (let k = 0; k < 8; k++) next()
+    for (let k = 0; k < (LOW_MEM ? 4 : 8); k++) next()
   }
 
   /** play a card's clip while it's clearly on screen, pause it otherwise */
@@ -246,6 +296,8 @@ export class WorkSpiral {
         el.addEventListener(
           'playing',
           () => {
+            if (v.el !== el) return // already let go of
+            if (v.mat.map !== tex) v.poster = v.mat.map
             v.mat.map = tex
             v.mat.needsUpdate = true
           },
@@ -259,13 +311,31 @@ export class WorkSpiral {
     } else if (!want && v.playing) {
       v.playing = false
       v.el?.pause()
+      if (LOW_MEM) this.releaseVideo(v)
     }
+  }
+
+  /** Back to the poster and free the clip's decoder and frame memory (phones). */
+  private releaseVideo(v: VideoSlot) {
+    if (v.poster && v.mat.map !== v.poster) {
+      v.mat.map = v.poster
+      v.mat.needsUpdate = true
+    }
+    if (v.el) {
+      v.el.pause()
+      v.el.removeAttribute('src')
+      v.el.load()
+    }
+    v.tex?.dispose()
+    v.el = null
+    v.tex = null
   }
 
   private stopVideos() {
     for (const v of this.videos) {
       v.playing = false
       v.el?.pause()
+      if (LOW_MEM) this.releaseVideo(v)
     }
   }
 
