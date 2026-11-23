@@ -296,7 +296,7 @@ export function SelectedWork() {
     const settle = () => {
       if (touching || snapping) return
       const s = useStore.getState()
-      if (s.focus || s.view || s.gallery) return
+      if (s.focus || s.view || s.gallery || s.codeLab) return
       const r = el.getBoundingClientRect()
       const vh = window.innerHeight
       // the stage is pinned while the section's top is above the screen and its bottom below it; outside

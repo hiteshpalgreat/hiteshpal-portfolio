@@ -17,7 +17,7 @@ export function RoomPan() {
   const stage = useStore((s) => s.stage)
   const focus = useStore((s) => s.focus)
   const view = useStore((s) => s.view)
-  const gallery = useStore((s) => s.gallery)
+  const gallery = useStore((s) => s.gallery || s.codeLab)
   const [narrow, setNarrow] = useState(false)
   const [top, setTop] = useState(true)
   const [pos, setPos] = useState(0)

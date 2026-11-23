@@ -30,6 +30,12 @@ const LEADS: Record<string, string> = {
   ipad: 'Watch the showreel',
   monitor_wide: 'Open my Framer site ↗',
   photo_frame: 'Flip through the photos',
+  monitor_vertical: 'See the code running',
+}
+
+/** what clicking does, for the items where it isn't obvious (shown next to the label in the room) */
+const HINTS: Record<string, string> = {
+  arcade: 'Click to start playing',
 }
 
 /** Small label that follows the cursor while an item is hovered (after the dwell). */
@@ -61,11 +67,11 @@ export function LabelChip() {
   const label = lead ?? (hovered?.userData.label as string | undefined)
   const view = useStore((s) => s.view)
   // the arcade is playable: say so while it's hovered from the room (not once you're already at it)
-  const playHint = !lead && !view && hovered?.userData.item_id === 'arcade'
+  const playHint = !lead && !view ? HINTS[hovered?.userData.item_id as string] : undefined
   return (
     <div ref={ref} className={`chip ${(hovered && dwell) || lead ? 'show' : ''} ${lead ? 'lead' : ''}`} aria-hidden>
       {label}
-      {playHint && <span className="chip-sub">Click to start playing</span>}
+      {playHint && <span className="chip-sub">{playHint}</span>}
     </div>
   )
 }
@@ -456,11 +462,54 @@ type Flash = { kind: 'play' | 'pause' | 'back' | 'fwd' | 'prev' | 'next' | 'info
 const RATES = [0.5, 0.75, 1, 1.25, 1.5, 2]
 const EDGE = 0.14 // share of the width on each side that changes the reel
 
+type FsDoc = Document & {
+  webkitFullscreenElement?: Element
+  webkitExitFullscreen?: () => void
+  webkitFullscreenEnabled?: boolean
+}
+type FsVideo = HTMLVideoElement & { webkitEnterFullscreen?: () => void; webkitSupportsFullscreen?: boolean }
+
+const isFullscreen = () => {
+  const doc = document as FsDoc
+  return !!(doc.fullscreenElement || doc.webkitFullscreenElement)
+}
+
+/**
+ * Full screen for the reel. Desktops, Android and iPads take the whole page full screen (so our own
+ * controls stay). iPhones can't do that for a page, only for a video: there the reel opens in the
+ * phone's own full-screen player, which also turns to landscape with the phone, and carries on in the
+ * page when it's closed.
+ */
 function toggleFullscreen() {
-  const doc = document as Document & { webkitFullscreenElement?: Element; webkitExitFullscreen?: () => void }
+  const doc = document as FsDoc
   const el = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => void }
-  if (doc.fullscreenElement || doc.webkitFullscreenElement) (doc.exitFullscreen?.() ?? doc.webkitExitFullscreen?.())
-  else (el.requestFullscreen?.() ?? el.webkitRequestFullscreen?.())?.catch?.(() => {})
+  if (isFullscreen()) {
+    ;(doc.exitFullscreen?.() ?? doc.webkitExitFullscreen?.())?.catch?.(() => {})
+    return
+  }
+  const pageFs = (doc.fullscreenEnabled || doc.webkitFullscreenEnabled) && (el.requestFullscreen || el.webkitRequestFullscreen)
+  if (pageFs) {
+    const r = el.requestFullscreen ? el.requestFullscreen() : el.webkitRequestFullscreen?.()
+    // landscape suits a 16:9 reel on a phone or tablet held upright (where the browser allows it)
+    Promise.resolve(r)
+      .then(() => (screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> })?.lock?.('landscape'))
+      .catch(() => {})
+    return
+  }
+  const v = showreel().video as FsVideo
+  if (v.webkitEnterFullscreen) {
+    const resume = () => {
+      v.removeEventListener('webkitendfullscreen', resume)
+      // iOS pauses the video when its player closes; pick up where it left off
+      if (!showreel().state.paused) v.play().catch(() => {})
+    }
+    v.addEventListener('webkitendfullscreen', resume)
+    try {
+      v.webkitEnterFullscreen()
+    } catch {
+      /* not ready yet */
+    }
+  }
 }
 
 export function ReelControls() {
@@ -478,9 +527,16 @@ export function ReelControls() {
   const clickTimer = useRef(0)
   useEffect(() => showreel().subscribe(setState), [])
   useEffect(() => {
-    const onFs = () => setIsFs(!!document.fullscreenElement)
+    const onFs = () => {
+      setIsFs(isFullscreen())
+      if (!isFullscreen()) (screen.orientation as ScreenOrientation & { unlock?: () => void })?.unlock?.()
+    }
     document.addEventListener('fullscreenchange', onFs)
-    return () => document.removeEventListener('fullscreenchange', onFs)
+    document.addEventListener('webkitfullscreenchange', onFs)
+    return () => {
+      document.removeEventListener('fullscreenchange', onFs)
+      document.removeEventListener('webkitfullscreenchange', onFs)
+    }
   }, [])
 
   const reel = showreel()

@@ -31,6 +31,8 @@ type State = {
   viewHover: Object3D | null
   /** the photo frame's stack of photos is open */
   gallery: boolean
+  /** the vertical screen's code view (source on the left, the running piece on the right) is open */
+  codeLab: boolean
   /** the next section fully covers the room after the iPad fly-in: 3D rendering is paused */
   dispersing: boolean
   set: (p: Partial<State>) => void
@@ -51,6 +53,7 @@ export const useStore = create<State>((set) => ({
   dispersing: false,
   viewHover: null,
   gallery: false,
+  codeLab: false,
   set: (p) => set(p),
 }))
 

@@ -182,7 +182,7 @@ export function Room() {
     }
     if (st.view) {
       // up close on the screens: the ones that lead somewhere light up under the cursor
-      const open = st.view.kind === 'screens' && st.view.phase === 'open' && !st.gallery
+      const open = st.view.kind === 'screens' && st.view.phase === 'open' && !st.gallery && !st.codeLab
       const hit = open ? findItem(e.intersections[0]?.object) : null
       const link = hit && LINKS.includes(hit.userData.item_id) ? hit : null
       if (link !== st.viewHover) st.set({ viewHover: link })
@@ -217,6 +217,7 @@ export function Room() {
         if (id === 'ipad') return goToShowreel()
         if (id === 'monitor_wide') return openWideScreenLink()
         if (id === 'photo_frame') return openPhotos()
+        if (id === 'monitor_vertical') return openCodeLab()
       }
       // clicking the arcade (or one of the screens) keeps you there; anything else takes you back
       if (!belongsToView(item)) travelBack()
@@ -242,11 +243,15 @@ export function Room() {
 
 /** Up close on the screens, these lead somewhere: the iPad to the showreel, the wide screen to the Framer
  *  site, the photo frame to its photos. */
-const LINKS = ['ipad', 'monitor_wide', 'photo_frame']
+const LINKS = ['ipad', 'monitor_wide', 'monitor_vertical', 'photo_frame']
 
 function openWideScreenLink() {
   const url = (content as any).screens?.monitor_wide?.link as string | undefined
   if (url) window.open(url, '_blank', 'noopener,noreferrer')
+}
+
+function openCodeLab() {
+  useStore.getState().set({ hovered: null, viewHover: null, codeLab: true })
 }
 
 function openPhotos() {

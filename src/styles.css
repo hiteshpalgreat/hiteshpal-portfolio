@@ -9,6 +9,9 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--night); }
+/* nothing may push the page wider than the screen: on phones that zooms the whole site out a little
+   and lets it slide sideways (and stretches full-screen layers past the right edge) */
+body { overflow-x: clip; }
 html { overflow: hidden; scrollbar-width: none; }
 html::-webkit-scrollbar { display: none; }
 html.can-scroll { overflow-y: auto; }
@@ -310,6 +313,9 @@ html.reel-idle .reel-edge { opacity: 0 !important; }
 /* the showreel grown to the full window at the end of the iPad fly-in (sits under the next section) */
 .reel-cover { position: fixed; z-index: 5; overflow: hidden; visibility: hidden; pointer-events: none; background: #000; }
 .reel-cover-video { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* on a screen held upright, cropping a 16:9 reel to fill it would cut away most of the picture:
+   show all of it, on black */
+@media (max-aspect-ratio: 1/1) { .reel-cover-video { object-fit: contain; } }
 
 /* ------------------------------------------------------------------ */
 /* section list, top left: dots plus the current section's name;        */
@@ -528,3 +534,87 @@ html.reel-idle .reel-edge { opacity: 0 !important; }
 .rp-btn:active { transform: scale(0.92); }
 .rp-btn:disabled { opacity: 0.25; cursor: default; }
 .rp-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ------------------------------------------------------------------ */
+/* code view (the vertical screen): source on the left, output right  */
+/* ------------------------------------------------------------------ */
+.codelab {
+  position: fixed; inset: 0; z-index: 60; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; padding: 28px;
+  background: rgba(8, 4, 7, 0.62); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  opacity: 0; pointer-events: none; transition: opacity 280ms ease;
+}
+.codelab.open { opacity: 1; pointer-events: auto; }
+.lab-win {
+  width: min(1480px, 100%); height: min(880px, 100%); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  border-radius: 16px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0d090c; box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
+  animation: lab-in 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes lab-in { from { opacity: 0; transform: translateY(18px) scale(0.985); } }
+.lab-win:focus { outline: none; }
+.lab-pane { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.lab-code { background: #110b0f; border-right: 1px solid rgba(255, 255, 255, 0.08); }
+.lab-bar {
+  flex: none; display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 12px 0 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08); font: 500 12.5px/1 Inter, system-ui, sans-serif; color: rgba(246, 238, 241, 0.55);
+}
+.lab-dots { display: flex; gap: 6px; margin-right: 4px; }
+.lab-dots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.14); }
+.lab-dots i:first-child { background: #ff598b; }
+.lab-tab { color: #f6eef1; padding: 6px 10px; border-radius: 7px; background: rgba(255, 255, 255, 0.06); }
+.lab-meta { margin-left: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lab-copy, .lab-tones button, .lab-close {
+  font: inherit; color: rgba(246, 238, 241, 0.7); background: transparent; cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 999px; height: 28px; padding: 0 12px;
+  transition: background 200ms ease, color 200ms ease;
+}
+.lab-copy { margin-left: auto; }
+.lab-copy:hover, .lab-tones button:hover, .lab-close:hover { background: rgba(255, 89, 139, 0.16); color: #fff; }
+.lab-tones { display: flex; gap: 4px; margin-left: auto; }
+.lab-tones button[aria-pressed='true'] { background: #f6eef1; color: #140b10; border-color: #f6eef1; }
+.lab-close { width: 32px; height: 32px; padding: 0; display: grid; place-items: center; margin-left: 6px; }
+.lab-close svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.lab-copy:focus-visible, .lab-tones button:focus-visible, .lab-close:focus-visible, .lab-src:focus-visible { outline: 2px solid #ff598b; outline-offset: 2px; }
+.lab-live { display: inline-flex; align-items: center; gap: 6px; color: rgba(246, 238, 241, 0.55); }
+.lab-live i { width: 7px; height: 7px; border-radius: 50%; background: #ff598b; box-shadow: 0 0 0 0 rgba(255, 89, 139, 0.6); animation: lab-pulse 1.8s ease-out infinite; }
+@keyframes lab-pulse { 70%, 100% { box-shadow: 0 0 0 8px rgba(255, 89, 139, 0); } }
+
+.lab-src {
+  flex: 1; min-height: 0; margin: 0; overflow: auto; padding: 14px 0 28px;
+  font: 12.5px/1.65 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace; color: #e9dde2;
+  tab-size: 2; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+.lab-src code { display: block; min-width: max-content; }
+.lab-line { display: flex; }
+.lab-ln { flex: none; width: 52px; padding-right: 16px; text-align: right; color: rgba(246, 238, 241, 0.22); user-select: none; }
+.lab-txt { white-space: pre; padding-right: 24px; }
+.lab-com { color: #7d6a73; font-style: italic; }
+.lab-str { color: #ffb3c9; }
+.lab-num { color: #f7c27a; }
+.lab-kw { color: #ff598b; }
+.lab-type { color: #9ad0ff; }
+.lab-fn { color: #c7b6ff; }
+
+.lab-out { background: #0b0709; }
+.lab-stage {
+  position: relative; flex: 1; min-height: 0; overflow: hidden; cursor: crosshair;
+  background: radial-gradient(60% 70% at 50% 100%, rgba(255, 89, 139, 0.2), transparent 70%);
+}
+.lab-stage.tone-blue { background: radial-gradient(60% 70% at 50% 100%, rgba(40, 110, 190, 0.28), transparent 70%); }
+.lab-stage.tone-white { background: radial-gradient(60% 70% at 50% 100%, rgba(255, 255, 255, 0.1), transparent 70%); }
+.lab-note { position: absolute; left: 16px; top: 58px; margin: 0; pointer-events: none; font: 12px/1.4 Inter, system-ui, sans-serif; color: rgba(246, 238, 241, 0.4); }
+
+/* phones and narrow windows: the output on top, the code scrolling under it */
+@media (max-width: 860px) {
+  .codelab { padding: 0; }
+  .lab-win { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 46%) minmax(0, 54%); height: 100%; border-radius: 0; border: 0; }
+  .lab-out { order: -1; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+  .lab-code { border-right: 0; }
+  .lab-meta, .lab-live, .lab-note { display: none; }
+  .lab-bar { gap: 6px; padding: 0 10px; }
+  .lab-copy, .lab-tones button { padding: 0 9px; }
+  .lab-src { font-size: 11.5px; }
+  .lab-ln { width: 40px; padding-right: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .lab-win { animation: none; } .lab-live i { animation: none; } }

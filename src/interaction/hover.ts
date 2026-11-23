@@ -176,7 +176,7 @@ function syncHighlightAll() {
 /** Up close on the screens: whatever leads somewhere glows under the cursor (no lift, no zoom). */
 let viewLit: THREE.Object3D | null = null
 function syncViewHover(s: ReturnType<typeof useStore.getState>) {
-  const want = s.view?.kind === 'screens' && s.view.phase === 'open' && !s.gallery ? s.viewHover : null
+  const want = s.view?.kind === 'screens' && s.view.phase === 'open' && !s.gallery && !s.codeLab ? s.viewHover : null
   if (!want && s.viewHover) queueMicrotask(() => useStore.getState().set({ viewHover: null }))
   if (want === viewLit) return
   if (viewLit) setGlow(viewLit, 0, 0.25)
@@ -189,7 +189,7 @@ function syncViewHover(s: ReturnType<typeof useStore.getState>) {
 /** React to hover changes (subscribed once from App). */
 export function initHover() {
   return useStore.subscribe((s, prev) => {
-    if (s.viewHover !== prev.viewHover || s.view !== prev.view || s.gallery !== prev.gallery) syncViewHover(s)
+    if (s.viewHover !== prev.viewHover || s.view !== prev.view || s.gallery !== prev.gallery || s.codeLab !== prev.codeLab) syncViewHover(s)
     if (s.highlightAll !== prev.highlightAll || s.focus !== prev.focus || s.view !== prev.view || s.stage !== prev.stage) syncHighlightAll()
     if (s.hovered === prev.hovered) return
     if (current) leave(current)

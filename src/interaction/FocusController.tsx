@@ -27,7 +27,7 @@ export function FocusController({ root }: { root: THREE.Object3D }) {
         stepFocus(e.key === 'ArrowRight' ? 1 : -1)
         return
       }
-      if (e.key === 'Escape' && !useStore.getState().gallery) {
+      if (e.key === 'Escape' && !useStore.getState().gallery && !useStore.getState().codeLab) {
         closeFocus()
         travelBack()
       }

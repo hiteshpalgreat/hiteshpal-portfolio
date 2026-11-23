@@ -1,5 +1,6 @@
 import { MusicToggle } from './ui/MusicToggle'
 import { RoomPan } from './ui/RoomPan'
+import { CodeLab } from './ui/CodeLab'
 import { Suspense, useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
@@ -116,7 +117,7 @@ export default function App() {
     // the page may scroll (to the content below the room) only once inside, and not while something is open
     const syncScroll = () => {
       const s = useStore.getState()
-      const on = s.stage === 'room' && !s.focus && !s.view && !s.gallery
+      const on = s.stage === 'room' && !s.focus && !s.view && !s.gallery && !s.codeLab
       document.documentElement.classList.toggle('can-scroll', on)
       setScrollEnabled(on)
     }
@@ -171,6 +172,7 @@ export default function App() {
       <PhotoStack />
       <MusicToggle />
       <RoomPan />
+      <CodeLab />
       <Loader />
     </>
   )

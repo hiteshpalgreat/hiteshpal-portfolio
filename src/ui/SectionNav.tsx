@@ -87,7 +87,7 @@ function startOf(s: Section) {
 
 export function SectionNav() {
   const ready = useStore((s) => s.ready)
-  const free = useStore((s) => s.ready && s.stage === 'room' && !s.focus && !s.view && !s.gallery)
+  const free = useStore((s) => s.ready && s.stage === 'room' && !s.focus && !s.view && !s.gallery && !s.codeLab)
   const [active, setActive] = useState('room')
   // the list only joins once the page reaches About; the room and the reel above it stay uncluttered
   const [reached, setReached] = useState(false)
